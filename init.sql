@@ -1,3 +1,5 @@
+CREATE EXTENSION postgis;
+
 DROP TYPE IF EXISTS user_role CASCADE;
 CREATE TYPE user_role AS ENUM (
   'user',

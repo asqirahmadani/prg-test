@@ -43,7 +43,6 @@ func AuthMiddleware(cfg config.JWTConfig) gin.HandlerFunc {
 
 		c.Set(utils.UserIDKey, int64(claims["sub"].(float64)))
 		c.Set(utils.RoleKey, claims["role"].(string))
-		c.Set(utils.VerifiedKey, claims["is_verified"].(bool))
 
 		c.Next()
 	}

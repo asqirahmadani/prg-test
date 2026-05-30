@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 	"perdin-backend/config"
 	"perdin-backend/dto/request"
 	"perdin-backend/model/entity"
@@ -40,6 +41,7 @@ func NewAuthUsecase(r AuthRepository, hasher PasswordHasher, tokenIssuer TokenIs
 		repo: r,
 		hasher: hasher,
 		tokenIssuer: tokenIssuer,
+		cfg: cfg,
 	}
 }
 
@@ -78,6 +80,7 @@ func (u *AuthUsecase) Login(c context.Context, data request.LoginRequest) (strin
 		return "", utils.ErrUnauthorize("invalid username or password")
 	}
 
+	log.Print("config jwt secret key: ", u.cfg.SecretKey)
 	token, err := u.tokenIssuer.IssueJWT(user.ID, user.Role, u.cfg)
 	if err != nil {
 		return "", err
