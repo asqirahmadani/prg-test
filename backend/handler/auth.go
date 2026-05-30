@@ -13,15 +13,16 @@ import (
 
 type AuthUsecase interface {
 	Register(c context.Context, data request.RegisterRequest) error
+	Login(c context.Context, data request.LoginRequest) (string, error)
 }
 
 type AuthHandler struct {
-	uc	AuthUsecase
+	usecase	AuthUsecase
 }
 
 func NewAuthHandler (uc AuthUsecase) *AuthHandler {
 	return &AuthHandler{
-		uc: uc,
+		usecase: uc,
 	}
 }
 
@@ -34,7 +35,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	if err := h.uc.Register(c.Request.Context(), reqBody); err != nil {
+	if err := h.usecase.Register(c.Request.Context(), reqBody); err != nil {
 		c.Error(err)
 
 		return
@@ -44,6 +45,29 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Message: "success",
 		Data: response.InfoResponse{
 			Info: "user registered successfully",
+		},
+	})
+}
+
+func (h *AuthHandler) Login(c *gin.Context) {
+	var reqBody request.LoginRequest
+
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
+		c.Error(utils.ErrBadRequest(fmt.Sprintf("binding error: %v", err)))
+
+		return
+	}
+
+	token, err := h.usecase.Login(c.Request.Context(), reqBody)
+	if err != nil {
+		c.Error(utils.ErrUnauthorize("invalid username or password"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSONResponse{
+		Message: "success",
+		Data: response.LoginResponse{
+			Token: token,
 		},
 	})
 }

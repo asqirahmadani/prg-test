@@ -25,6 +25,7 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 		auth := root.Group("/auth")
 		{
 			auth.POST("/register", handler.Auth.Register)
+			auth.POST("/login", handler.Auth.Login)
 		}
 	}
 

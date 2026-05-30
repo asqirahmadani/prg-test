@@ -48,7 +48,7 @@ func initHandlers(cfg config.Config, db *sqlx.DB) (*handler.Handlers) {
 	hasher := &utils.PasswordHasher{}
 	tokenIssuer := &utils.TokenIssuer{}
 
-	authUsecase := usecase.NewAuthUsecase(authRepo, hasher, tokenIssuer)
+	authUsecase := usecase.NewAuthUsecase(authRepo, hasher, tokenIssuer, cfg.JWT)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
 	handler := handler.NewHandlers(*authHandler)

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"perdin-backend/dto/request"
+	"perdin-backend/model/entity"
 	"perdin-backend/utils"
 
 	"github.com/jmoiron/sqlx"
@@ -35,4 +36,19 @@ func(r *AuthRepository) ExistsByUsername(c context.Context, username string) (bo
 	}
 
 	return exists, nil
+}
+
+func(r *AuthRepository) GetByUsername(c context.Context, username string) (entity.User, error) {
+	query := `
+		SELECT id, role, password_hash
+		FROM users
+		WHERE username = $1;
+	`
+
+	var user entity.User
+	if err := r.db.GetContext(c, &user, query, username); err != nil {
+		return entity.User{}, err
+	}
+
+	return user, nil
 }
