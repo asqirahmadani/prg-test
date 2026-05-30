@@ -3,9 +3,12 @@ package main
 import (
 	"log"
 	"perdin-backend/config"
+	"perdin-backend/handler"
 	"perdin-backend/repo/postgres"
 	"perdin-backend/router"
 	"perdin-backend/server"
+	"perdin-backend/usecase"
+	"perdin-backend/utils"
 	"perdin-backend/utils/logger"
 
 	"github.com/jmoiron/sqlx"
@@ -20,7 +23,9 @@ func main() {
 	initLogger()
 	defer func() { _ = logger.Log.Sync() }()
 
-	server.StartHTTPServer(router.SetupRouter(*cfg), cfg.App)
+	handlers := initHandlers(*cfg, db)
+
+	server.StartHTTPServer(router.SetupRouter(*cfg, handlers), cfg.App)
 }
 
 func initDB(cfg config.Config) *sqlx.DB {
@@ -35,4 +40,18 @@ func initLogger() {
 	if err := logger.InitZapSugaredLogger(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func initHandlers(cfg config.Config, db *sqlx.DB) (*handler.Handlers) {
+	authRepo := postgres.NewAuthRepository(db)
+
+	hasher := &utils.PasswordHasher{}
+	tokenIssuer := &utils.TokenIssuer{}
+
+	authUsecase := usecase.NewAuthUsecase(authRepo, hasher, tokenIssuer)
+	authHandler := handler.NewAuthHandler(authUsecase)
+
+	handler := handler.NewHandlers(*authHandler)
+
+	return handler
 }

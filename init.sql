@@ -2,7 +2,7 @@ DROP TYPE IF EXISTS user_role CASCADE;
 CREATE TYPE user_role AS ENUM (
   'user',
   'admin',
-  'recruiter'
+  'sdm'
 );
 
 DROP TABLE IF EXISTS users CASCADE;

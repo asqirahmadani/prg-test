@@ -2,13 +2,14 @@ package router
 
 import (
 	"perdin-backend/config"
+	"perdin-backend/handler"
 	"perdin-backend/middleware"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(cfg config.Config) *gin.Engine {
+func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 	r := gin.New()
 
 	r.Use(
@@ -18,6 +19,14 @@ func SetupRouter(cfg config.Config) *gin.Engine {
 		middleware.ErrorMiddleware(),
 		middleware.TimeoutMiddleware(time.Duration(cfg.App.RequestTimeout)*time.Second),
 	)
+
+	root := r.Group("/api/v1")
+	{
+		auth := root.Group("/auth")
+		{
+			auth.POST("/register", handler.Auth.Register)
+		}
+	}
 
 	return r
 }
