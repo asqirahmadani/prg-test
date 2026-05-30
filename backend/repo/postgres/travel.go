@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"math"
 	"perdin-backend/model/entity"
 	"perdin-backend/utils"
 
@@ -32,7 +33,6 @@ func (r *TravelRepository) CreateTrip(c context.Context, data entity.OfficialTra
 func(r *TravelRepository) GetCityByID(c context.Context, cityID int) (entity.City, error) {
 	query := `
 		SELECT
-			id,
 			name,
 			province,
 			island,
@@ -50,5 +50,16 @@ func(r *TravelRepository) GetCityByID(c context.Context, cityID int) (entity.Cit
 }
 
 func(r *TravelRepository) GetCityDistance(c context.Context, originID, destinationID int) (int, error) {
-	return 0, utils.ErrInternalServer("fix distance pls")
+	query := `
+		SELECT ST_DistanceSphere(c1.location, c2.location) / 1000 AS distance_km
+		FROM cities c1, cities c2
+		WHERE c1.id = $1 AND c2.id = $2;
+	`
+
+	var distance float64
+	if err := r.db.GetContext(c, &distance, query, originID, destinationID); err != nil {
+		return 0, err
+	}
+	
+	return int(math.Ceil(distance)), nil
 }

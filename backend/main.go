@@ -45,6 +45,7 @@ func initLogger() {
 func initHandlers(cfg config.Config, db *sqlx.DB) (*handler.Handlers) {
 	authRepo := postgres.NewAuthRepository(db)
 	travelRepo := postgres.NewTravelRepository(db)
+	cityRepo := postgres.NewCityRepository(db)
 
 	hasher := &utils.PasswordHasher{}
 	tokenIssuer := &utils.TokenIssuer{}
@@ -55,7 +56,10 @@ func initHandlers(cfg config.Config, db *sqlx.DB) (*handler.Handlers) {
 	travelUsecase := usecase.NewTravelUsecase(travelRepo)
 	travelHandler := handler.NewTravelHandler(travelUsecase)
 
-	handler := handler.NewHandlers(*authHandler, *travelHandler)
+	cityUsecase := usecase.NewCityUsecase(cityRepo)
+	cityHandler := handler.NewCityHandler(cityUsecase)
+
+	handler := handler.NewHandlers(*authHandler, *travelHandler, *cityHandler)
 
 	return handler
 }

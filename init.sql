@@ -5,6 +5,13 @@ CREATE TYPE user_role AS ENUM (
   'sdm'
 );
 
+DROP TYPE IF EXISTS trip_status CASCADE;
+CREATE TYPE trip_status AS ENUM (
+    'pending',
+    'approved',
+    'declined'
+)
+
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id            BIGSERIAL PRIMARY KEY,
@@ -38,7 +45,7 @@ CREATE TABLE official_travels (
     destination_city_id BIGINT      NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
     trip_duration       INT         NOT NULL,
     allowance           DECIMAL     NOT NULL,
-    approved            BOOLEAN     NOT NULL DEFAULT FALSE,
+    status              trip_status NOT NULL DEFAULT 'pending',
     created_at          TIMESTAMP   NOT NULL,
     updated_at          TIMESTAMP   NOT NULL
 )

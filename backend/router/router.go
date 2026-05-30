@@ -34,6 +34,13 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 			travel.Use(middleware.RoleAccess("user"))
 			travel.POST("", handler.Travel.CreateTrip)
 		}
+
+		city := root.Group("/city")
+		city.Use(middleware.AuthMiddleware(cfg.JWT))
+		{
+			city.Use(middleware.RoleAccess("sdm"))
+			city.POST("", handler.City.CreateCity)
+		}
 	}
 
 	return r

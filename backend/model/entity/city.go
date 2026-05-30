@@ -1,9 +1,17 @@
 package entity
 
 type City struct {
-	ID			int
-	Name		string
-	Province	string
-	Island		string
-	IsAbroad	bool
+	Name		string	`db:"name"`
+	Province	string	`db:"province"`
+	Island		string	`db:"island"`
+	IsAbroad	bool	`db:"is_abroad"`
+}
+
+type CreateCity struct {
+	Name		string	`db:"name"`
+	Province	string	`db:"province"`
+	Island		string	`db:"island"`
+	IsAbroad	bool	`db:"is_abroad"`
+	Longitude	float64	`db:"longitude"`
+	Latitude	float64	`db:"latitude"`
 }
