@@ -29,13 +29,13 @@ CREATE TABLE cities (
 );
 
 DROP TABLE IF EXISTS official_travel CASCADE;
-CREATE TABLE official_travel (
+CREATE TABLE official_travels (
     id                  BIGSERIAL PRIMARY KEY,
     user_id             BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     departure_date      DATE        NOT NULL,
     return_date         DATE        NOT NULL,
-    origin_city         BIGINT      NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
-    destination_city    BIGINT      NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
+    origin_city_id      BIGINT      NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
+    destination_city_id BIGINT      NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
     trip_duration       INT         NOT NULL,
     allowance           DECIMAL     NOT NULL,
     approved            BOOLEAN     NOT NULL DEFAULT FALSE,

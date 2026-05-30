@@ -27,6 +27,13 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 			auth.POST("/register", handler.Auth.Register)
 			auth.POST("/login", handler.Auth.Login)
 		}
+
+		travel := root.Group("/travel")
+		travel.Use(middleware.AuthMiddleware(cfg.JWT))
+		{
+			travel.Use(middleware.RoleAccess("user"))
+			travel.POST("", handler.Travel.CreateTrip)
+		}
 	}
 
 	return r
