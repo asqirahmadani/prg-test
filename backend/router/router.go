@@ -33,6 +33,7 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 		{
 			travel.Use(middleware.RoleAccess("user"))
 			travel.POST("", handler.Travel.CreateTrip)
+			travel.GET("/list", handler.Travel.UserTravelList)
 		}
 
 		city := root.Group("/city")

@@ -45,11 +45,12 @@ CREATE TABLE official_travels (
     return_date         DATE        NOT NULL,
     origin_city_id      BIGINT      NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
     destination_city_id BIGINT      NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
+    description         TEXT        NOT NULL DEFAULT '',
     trip_duration       INT         NOT NULL,
     allowance           DECIMAL     NOT NULL,
     status              trip_status NOT NULL DEFAULT 'pending',
-    created_at          TIMESTAMP   NOT NULL,
-    updated_at          TIMESTAMP   NOT NULL
+    created_at          TIMESTAMP   NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMP   NOT NULL DEFAULT NOW()
 )
 
 CREATE INDEX idx_cities_location ON cities USING GIST(location);
