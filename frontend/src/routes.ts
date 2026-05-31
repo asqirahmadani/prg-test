@@ -8,7 +8,6 @@ import {
 import LoginPage from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { SdmDashboard } from "./pages/SdmDashboard";
-import { UserDashboard } from "./pages/UserDashboard";
 import { UserLayout } from "./components/layout/UserLayout";
 import { SdmLayout } from "./components/layout/SdmLayout";
 import PerdinList from "./pages/user/perdinku";

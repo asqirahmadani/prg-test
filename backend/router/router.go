@@ -34,7 +34,7 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 			users.GET("/profile", handler.Auth.Profile)
 		}
 
-		travel := root.Group("/travel")
+		travel := root.Group("/travels")
 		travel.Use(middleware.AuthMiddleware(cfg.JWT))
 		{
 			travel.Use(middleware.RoleAccess("user"))

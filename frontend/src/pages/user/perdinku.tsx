@@ -26,6 +26,10 @@ import {
   LucideSearch,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import PerdinDialog from "../../components/dialog/PerdinDialog";
+import type { TravelRequest } from "../../types/travel";
+import { useTravel } from "../../hooks/useTravel";
+import { mToast } from "../../components/base/mToast";
 
 function StatusPill({ status }: { status: TravelStatus }) {
   const styles = {
@@ -47,6 +51,9 @@ function StatusPill({ status }: { status: TravelStatus }) {
 const PAGE_SIZE = 10;
 
 export default function PerdinList() {
+  const { create } = useTravel();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
 
   const { user } = useAuth();
@@ -67,7 +74,7 @@ export default function PerdinList() {
     mutate,
   } = useSWR<UserTravel>(
     [
-      `${import.meta.env.VITE_BACKEND_URL}/travel/list?${buildParams()}`,
+      `${import.meta.env.VITE_BACKEND_URL}/travels/list?${buildParams()}`,
       user.token,
     ],
     authFetcher,
@@ -79,8 +86,27 @@ export default function PerdinList() {
 
   const visiblePages = getVisiblePages(page, totalPages);
 
+  const handleSubmit = async (a: TravelRequest) => {
+    try {
+      await create(a);
+      setDialogOpen(false);
+      mToast.success("Perjalanan dinas berhasil diajukan!");
+    } catch (err) {
+      mToast.error(err instanceof Error ? err.message : "Gagal mengajukan perdin");
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
+      <div>
+        <button
+          onClick={() => setDialogOpen(true)}
+          className="w-full group flex flex-col items-center justify-center gap-4 py-16 rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-primary/2 hover:border-primary/30 transition-all duration-300"
+        >
+          Tambah Perdin
+        </button>
+      </div>
+
       <div className="rounded-xl border border-slate-200/80 overflow-hidden bg-white shadow-sm">
         <Table>
           <TableHeader>
@@ -231,6 +257,12 @@ export default function PerdinList() {
           </Button>
         </div>
       </div>
+
+      <PerdinDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }
