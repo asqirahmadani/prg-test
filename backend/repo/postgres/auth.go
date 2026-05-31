@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"log"
 	"perdin-backend/dto/request"
 	"perdin-backend/model/entity"
 	"perdin-backend/utils"
@@ -51,4 +52,21 @@ func(r *AuthRepository) GetByUsername(c context.Context, username string) (entit
 	}
 
 	return user, nil
+}
+
+func(r *AuthRepository) ProfileUserByID(c context.Context, userID int) (entity.UserProfile, error) {
+	query := `
+		SELECT
+			name,
+			username
+		FROM users
+		WHERE id = $1;
+	`
+
+	var profile entity.UserProfile
+	if err := r.db.GetContext(c, &profile, query, userID); err != nil {
+		return entity.UserProfile{}, err
+	}
+	log.Print(profile)
+	return profile, nil
 }

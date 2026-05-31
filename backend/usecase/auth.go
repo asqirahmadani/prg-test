@@ -7,6 +7,8 @@ import (
 	"log"
 	"perdin-backend/config"
 	"perdin-backend/dto/request"
+	"perdin-backend/dto/response"
+	"perdin-backend/mapper"
 	"perdin-backend/model/entity"
 	"perdin-backend/utils"
 
@@ -17,6 +19,7 @@ type AuthRepository interface {
 	CreateUser(c context.Context, data request.RegisterRequest) (error)
 	ExistsByUsername(c context.Context, username string) (bool, error)
 	GetByUsername(c context.Context, username string) (entity.User, error)
+	ProfileUserByID(c context.Context, userID int) (entity.UserProfile, error)
 }
 
 type PasswordHasher interface {
@@ -87,4 +90,13 @@ func (u *AuthUsecase) Login(c context.Context, data request.LoginRequest) (strin
 	}
 	
 	return token, nil
+}
+
+func (u *AuthUsecase) Profile(c context.Context, userID int) (response.ProfileUserResponse, error) {
+	profile, err := u.repo.ProfileUserByID(c, userID)
+	if err != nil {
+		return response.ProfileUserResponse{}, err
+	}
+
+	return mapper.UserProfileToResponse(profile), nil
 }

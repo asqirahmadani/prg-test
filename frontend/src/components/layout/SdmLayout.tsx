@@ -63,7 +63,7 @@ export const SdmLayout = () => {
                       <img
                         className="w-32 object-contain"
                         src={Logo}
-                        alt="Hewan Hewan"
+                        alt="Akhdani"
                       />
                     </Link>
                   </SidebarMenuButton>

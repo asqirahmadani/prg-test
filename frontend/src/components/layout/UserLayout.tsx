@@ -58,7 +58,7 @@ export const UserLayout = () => {
                       <img
                         className="w-32 object-contain"
                         src={Logo}
-                        alt="Hewan Hewan"
+                        alt="Akhdani"
                       />
                     </Link>
                   </SidebarMenuButton>

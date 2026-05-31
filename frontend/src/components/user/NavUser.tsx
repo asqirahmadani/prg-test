@@ -40,6 +40,7 @@ export function NavUser() {
   );
 
   const profile = data?.data;
+  console.log(data);
 
   return (
     <SidebarMenu>
@@ -60,7 +61,9 @@ export function NavUser() {
                   {isLoading ? "Loading..." : profile?.name || "User"}
                 </span>
                 <span className="truncate text-xs text-muted-foreground">
-                  {isLoading ? "..." : profile?.email || "Email tidak tersedia"}
+                  {isLoading
+                    ? "..."
+                    : profile?.username || "Username tidak tersedia"}
                 </span>
               </div>
             </SidebarMenuButton>
@@ -83,7 +86,7 @@ export function NavUser() {
                     {profile?.name || "User Name"}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {profile?.email || "User Email"}
+                    {profile?.username || "Username"}
                   </span>
                 </div>
               </div>
