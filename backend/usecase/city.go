@@ -3,6 +3,8 @@ package usecase
 import (
 	"context"
 	"perdin-backend/dto/request"
+	"perdin-backend/dto/response"
+	"perdin-backend/mapper"
 	"perdin-backend/model/entity"
 	"perdin-backend/utils"
 )
@@ -10,6 +12,7 @@ import (
 type CityRepository interface {
 	CreateCity(c context.Context, data entity.CreateCity) (error)
 	ExistsByName(c context.Context, cityName string) (bool, error)
+	GetCities(c context.Context) ([]entity.CityList, error)
 }
 
 type CityUsecase struct {
@@ -43,4 +46,13 @@ func(u *CityUsecase) CreateCity(c context.Context, data request.CreateCityReques
 	}
 	
 	return nil
+}
+
+func(u *CityUsecase) GetCities(c context.Context) ([]response.CityResponse, error) {
+	cities, err := u.repo.GetCities(c)
+	if err != nil {
+		return nil, err
+	}
+	
+	return mapper.CityToResponses(cities), nil
 }

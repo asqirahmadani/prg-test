@@ -42,9 +42,11 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 			travel.GET("/list", handler.Travel.UserTravelList)
 		}
 
-		city := root.Group("/city")
+		city := root.Group("/cities")
 		city.Use(middleware.AuthMiddleware(cfg.JWT))
 		{
+			city.GET("", handler.City.GetCities)
+
 			city.Use(middleware.RoleAccess("sdm"))
 			city.POST("", handler.City.CreateCity)
 		}

@@ -13,6 +13,7 @@ import (
 
 type CityUsecase interface {
 	CreateCity(c context.Context, data request.CreateCityRequest) error
+	GetCities(c context.Context) ([]response.CityResponse, error)
 }
 
 type CityHandler struct {
@@ -45,5 +46,19 @@ func(h *CityHandler) CreateCity(c *gin.Context) {
 		Data: response.InfoResponse{
 			Info: "city created successfully",
 		},
+	})
+}
+
+func(h *CityHandler) GetCities(c *gin.Context) {
+	cities, err := h.usecase.GetCities(c.Request.Context())
+	if err != nil {
+		c.Error(err)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSONResponse{
+		Message: "success",
+		Data: cities,
 	})
 }

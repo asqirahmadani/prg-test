@@ -50,3 +50,19 @@ func(r *CityRepository) CreateCity(c context.Context, data entity.CreateCity) (e
 
 	return utils.CheckRowsAffected(rows, err, "failed to create city")
 }
+
+func(r *CityRepository) GetCities(c context.Context) ([]entity.CityList, error) {
+	query := `
+		SELECT
+			id,
+			name
+		FROM cities;
+	`
+
+	var cities []entity.CityList
+	if err := r.db.SelectContext(c, &cities, query); err != nil {
+		return nil, err
+	}
+	
+	return cities, nil
+}

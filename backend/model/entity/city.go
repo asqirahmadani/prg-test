@@ -15,3 +15,8 @@ type CreateCity struct {
 	Longitude	float64	`db:"longitude"`
 	Latitude	float64	`db:"latitude"`
 }
+
+type CityList struct {
+	ID		int		`db:"id"`
+	Name	string	`db:"name"`
+}
