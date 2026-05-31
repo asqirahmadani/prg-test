@@ -11,6 +11,7 @@ import { SdmDashboard } from "./pages/SdmDashboard";
 import { UserDashboard } from "./pages/UserDashboard";
 import { UserLayout } from "./components/layout/UserLayout";
 import { SdmLayout } from "./components/layout/SdmLayout";
+import PerdinList from "./pages/user/perdinku";
 
 export const routes = createBrowserRouter([
   {
@@ -41,7 +42,7 @@ export const routes = createBrowserRouter([
           {
             path: "user/dashboard",
             Component: UserLayout,
-            children: [{ index: true, Component: UserDashboard }],
+            children: [{ index: true, Component: PerdinList }],
           },
         ],
       },
