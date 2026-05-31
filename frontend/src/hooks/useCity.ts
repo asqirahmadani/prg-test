@@ -1,24 +1,30 @@
 import useSWR from "swr";
-import type { CityData } from "../api/city";
-import { fetcher } from "../utils/fetcher";
-import { useState } from "react";
+import type { City } from "../api/city";
+import { authFetcher } from "../utils/fetcher";
+import { useMemo } from "react";
+import { useAuth } from "../hooks/auth";
 import type { SelectOption } from "../types/base";
 
-export function useCities() {
-  const [cities, setCities] = useState<SelectOption[]>([]);
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-  const { data, ...rest } = useSWR<{ message: string; data: CityData }>(
-    "/cities",
-    fetcher,
+export function useCities() {
+  const { user } = useAuth();
+
+  const { data, ...rest } = useSWR<{ message: string; data: City[] }>(
+    [`${API_BASE_URL}/cities`, user.token],
+    authFetcher,
     {
       revalidateOnFocus: false,
     },
   );
 
-  const citiesData: CityData | null = data?.data ? data.data : null;
-  if (citiesData) {
-    setCities(citiesData.cities.map((city) => ({ value: city.id, label: city.name })));
-  }
+  const cities = useMemo<SelectOption[]>(() => {
+    if (!data?.data) return [];
+    return data.data.map((city) => ({
+      value: city.id,
+      label: city.name,
+    }));
+  }, [data]);
 
   return { cities, ...rest };
 }

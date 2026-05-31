@@ -1,6 +1,4 @@
-import { useAuth } from "../hooks/auth";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -30,15 +28,11 @@ export const fetcher = async <TData = unknown, TResponse = unknown>(
 ) => {
   const url = endpoint.startsWith("http")
     ? endpoint
-    : `${API_BASE_URL}${endpoint}`;
+    : `${BACKEND_URL}${endpoint}`;
 
-  const { user } = useAuth();
-
-  const token = user.token;
   const headers: Record<string, string> = {
     ...arg?.header,
     ...(arg && arg.data && { "Content-Type": "application/json" }),
-    ...(token && { Authorization: `Bearer ${token}` }),
   };
 
   const res = await fetch(url, {
@@ -66,14 +60,11 @@ export const mutator = async <TData = unknown, TResponse = unknown>(
 ) => {
   const url = endpoint.startsWith("http")
     ? endpoint
-    : `${API_BASE_URL}${endpoint}`;
+    : `${BACKEND_URL}${endpoint}`;
 
-  const { user } = useAuth();
-
-  const token = user.token;
   const headers: Record<string, string> = {
+    ...arg?.header,
     ...(arg.data && { "Content-Type": "application/json" }),
-    ...(token && { Authorization: `Bearer ${token}` }),
   };
 
   const res = await fetch(url, {

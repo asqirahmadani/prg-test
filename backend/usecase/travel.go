@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"time"
 
 	"perdin-backend/dto/request"
 	"perdin-backend/dto/response"
@@ -33,11 +34,21 @@ func NewTravelUsecase(r TravelRepository) *TravelUsecase {
 }
 
 func (u *TravelUsecase) CreateTrip(c context.Context, data request.CreateTripRequest) error {
-	if data.ReturnDate.Before(data.DepartureDate) {
+	departureDate, err := time.Parse("2006-01-02", data.DepartureDate)
+	if err != nil {
+		return utils.ErrBadRequest("invalid departure_date format, expected YYYY-MM-DD")
+	}
+
+	returnDate, err := time.Parse("2006-01-02", data.ReturnDate)
+	if err != nil {
+		return utils.ErrBadRequest("invalid return_date format, expected YYYY-MM-DD")
+	}
+
+	if returnDate.Before(departureDate) {
 		return utils.ErrUnprocessableEntity("return date cannot berfore departure date")
 	}
 
-	tripDuration := int(data.ReturnDate.Sub(data.DepartureDate).Hours() / 24)
+	tripDuration := int(returnDate.Sub(departureDate).Hours() / 24)
 
 	allowance, err := u.getAllowance(c, data.OriginCityID, data.DestinationCityID, tripDuration)
 	if err != nil {
@@ -46,8 +57,8 @@ func (u *TravelUsecase) CreateTrip(c context.Context, data request.CreateTripReq
 
 	if err := u.repo.CreateTrip(c, entity.OfficialTravel{
 		UserID: *data.UserID,
-		DepartureDate: data.DepartureDate,
-		ReturnDate: data.ReturnDate,
+		DepartureDate: departureDate,
+		ReturnDate: returnDate,
 		OriginCityID: data.OriginCityID,
 		DestinationCityID: data.DestinationCityID,
 		Description: data.Description,
