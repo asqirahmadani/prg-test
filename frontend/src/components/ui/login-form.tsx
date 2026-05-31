@@ -2,6 +2,7 @@ import { Field, FieldGroup, FieldLabel } from "./field";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/auth";
+import { ROLE_ROUTES } from "../../lib/constants";
 import { cn } from "../../lib/utils";
 import { Button } from "./button";
 import { Input } from "./input";
@@ -19,8 +20,8 @@ export function LoginForm({
 
   useEffect(() => {
     if (user) {
-      console.log(user);
-      navigate("/dashboard");
+      const path = ROLE_ROUTES[user.role] || "/dashboard";
+      navigate(path, { replace: true });
     }
   }, [user, navigate]);
 
