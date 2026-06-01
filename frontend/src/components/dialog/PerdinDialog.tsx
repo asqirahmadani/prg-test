@@ -13,6 +13,7 @@ import { Input } from "../ui/input";
 import CustomSelect from "../base/Select";
 import { useCities } from "../../hooks/useCity";
 import type { TravelRequest } from "../../types/travel";
+import { Textarea } from "../ui/textarea";
 
 const PerdinDialog = ({
   open,
@@ -86,11 +87,10 @@ const PerdinDialog = ({
 
             <Field>
               <FieldLabel>Keterangan</FieldLabel>
-              <textarea
+              <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-              ></textarea>
+              />
             </Field>
           </FieldGroup>
         </div>

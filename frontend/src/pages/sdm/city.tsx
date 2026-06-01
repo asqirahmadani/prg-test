@@ -1,15 +1,9 @@
 import { useState } from "react";
-import {
-  formatDate,
-  formatNumber,
-  getVisiblePages,
-  type TravelQuery,
-  type TravelStatus,
-} from "../../utils/user";
 import { useAuth } from "../../hooks/auth";
 import useSWR from "swr";
-import type { UserTravel } from "../../api/user";
 import { authFetcher } from "../../utils/fetcher";
+import type { SdmCity } from "../../api/city";
+import { formatNumber, getVisiblePages } from "../../utils/user";
 import {
   Table,
   TableBody,
@@ -20,48 +14,19 @@ import {
 } from "../../components/ui/table";
 import { TableState } from "../../components/user/TableState";
 import {
-  LucideBadgeX,
-  LucideCheckCircle,
   LucideChevronFirst,
   LucideChevronLast,
   LucideChevronLeft,
   LucideChevronRight,
   LucideSearch,
-  LucideXCircle,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { PerdinActionDialog } from "../../components/dialog/PerdinActionDialog";
-import useSWRMutation from "swr/mutation";
-import { mToast } from "../../components/base/mToast";
-
-function StatusPill({ status }: { status: TravelStatus }) {
-  const styles = {
-    pending: "bg-yellow-50 text-amber-700",
-    approved: "bg-emerald-50 text-emerald-700",
-    declined: "bg-red-50 text-red-600",
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${styles[status]}`}
-    >
-      <span className="w-1.5 h-1.5 rounded-full bg-current" />
-      {status}
-    </span>
-  );
-}
 
 const PAGE_SIZE = 10;
 
-export default function SdmPerdinList() {
-  const [selectedStatus, setSelectedStatus] = useState<TravelQuery>("pending");
+export default function CityList() {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
-
-  const [selectedRow, setSelectedRow] = useState<any | null>(null);
-  const [dialogState, setDialogState] = useState<{
-    open: boolean;
-    type: "approve" | "decline";
-  }>({ open: false, type: "approve" });
 
   const { user } = useAuth();
 
@@ -71,8 +36,6 @@ export default function SdmPerdinList() {
       limit: String(PAGE_SIZE),
     });
 
-    if (selectedStatus) params.append("status", String(selectedStatus));
-
     return params.toString();
   };
 
@@ -81,7 +44,7 @@ export default function SdmPerdinList() {
     isLoading,
     error,
     mutate,
-  } = useSWR<UserTravel>(
+  } = useSWR<SdmCity>(
     [
       `${import.meta.env.VITE_BACKEND_URL}/sdm/travels?${buildParams()}`,
       user.token,
@@ -89,76 +52,23 @@ export default function SdmPerdinList() {
     authFetcher,
   );
 
-  const paged = rawData?.data?.travels;
+  const paged = rawData?.data?.cities;
   const totalItems = rawData?.data?.meta?.total ?? 0;
   const totalPages = Math.max(1, rawData?.data?.meta?.last_page ?? 1);
-
-  async function updateTravelRequest(
-    url: string,
-    { arg }: { arg: { travelID: number; action: string } },
-  ) {
-    const { travelID, action } = arg;
-
-    const response = await fetch(`${url}/${travelID}/${action}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
-
-    if (!response.ok) throw new Error("Failed to update the withdraw status");
-    return response.json;
-  }
-
-  const { trigger: triggerAction, isMutating: isUpdating } = useSWRMutation(
-    `${import.meta.env.VITE_BACKEND_URL}/sdm/travels`,
-    updateTravelRequest,
-  );
-
-  const handleAction = async () => {
-    if (!selectedRow) return;
-
-    try {
-      await triggerAction({
-        travelID: selectedRow.id,
-        action: dialogState.type === "approve" ? "approve" : "decline",
-      });
-
-      setDialogState((prev) => ({ ...prev, open: false }));
-
-      mutate();
-    } catch (error) {
-      mToast.error(error.message);
-    }
-  };
 
   const visiblePages = getVisiblePages(page, totalPages);
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <Button
-          className={
-            selectedStatus === "pending"
-              ? "bg-blue-500 cursor-pointer"
-              : "bg-blue-300 cursor-pointer"
-          }
-          onClick={() => setSelectedStatus("pending")}
+      <div className="flex flex-row justify-between">
+        <div className="flex"></div>
+
+        <button
+          onClick={() => setDialogOpen(true)}
+          className="w-50 group flex flex-col items-center justify-center gap-4 py- rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-primary/2 hover:border-primary/30 transition-all duration-300"
         >
-          Pengajuan Baru
-        </Button>
-        <Button
-          //   variant="ghost"
-          className={
-            selectedStatus === "history"
-              ? "bg-blue-500 cursor-pointer"
-              : "bg-blue-300 cursor-pointer"
-          }
-          onClick={() => setSelectedStatus("history")}
-        >
-          History Pengajuan
-        </Button>
+          Tambah Perdin
+        </button>
       </div>
 
       <div className="rounded-xl border border-slate-200/80 overflow-hidden bg-white shadow-sm">
@@ -169,22 +79,22 @@ export default function SdmPerdinList() {
                 ID
               </TableHead>
               <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
-                Nama
+                Nama Kota
               </TableHead>
               <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
-                Kota
+                Provinsi
               </TableHead>
               <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
-                Tanggal
+                Pulau
               </TableHead>
               <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
-                Keterangan
+                Luar Negeri
               </TableHead>
               <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
-                Status
+                Latitude
               </TableHead>
               <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
-                Aksi
+                Longitude
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -203,10 +113,10 @@ export default function SdmPerdinList() {
                   <div className="flex flex-col items-center justify-center py-16 text-slate-400">
                     <LucideSearch className="w-8 h-8 mb-3 opacity-40" />
                     <p className="text-sm font-medium">
-                      Tidak ada perdin yang ditemukan
+                      Tidak ada kota yang ditemukan
                     </p>
                     <p className="text-xs mt-1">
-                      Ajukan perdin atau hubungi admin jika ada masalah
+                      Tambahkan data kota atau hubungi admin jika ada masalah
                     </p>
                   </div>
                 </TableCell>
@@ -222,87 +132,44 @@ export default function SdmPerdinList() {
 
                   <TableCell className="px-4 py-3.5">
                     <span className="text-sm text-slate-600 truncate max-w-50">
-                      {item.user_name}
+                      {item.name}
                     </span>
                   </TableCell>
 
                   <TableCell className="px-4 py-3.5">
                     <span className="text-sm text-slate-600 truncate max-w-50">
-                      {item.origin_city} → {item.destination_city}
+                      {item.province}
                     </span>
                   </TableCell>
 
                   <TableCell className="px-4 py-3.5">
                     <span className="text-sm text-slate-600 truncate max-w-50">
-                      {formatDate(item.departure_date)} -
-                      {formatDate(item.return_date)} ({item.trip_duration} hari)
+                      {item.island}
                     </span>
                   </TableCell>
 
                   <TableCell className="px-4 py-3.5">
                     <span className="text-sm text-slate-600 truncate max-w-50">
-                      {item.description}
+                      {item.is_abroad ? "Iya" : "Tidak"}
                     </span>
                   </TableCell>
 
                   <TableCell className="px-4 py-3.5">
-                    <StatusPill status={item.status} />
+                    <span className="text-sm text-slate-600 truncate max-w-50">
+                      {item.latitude}
+                    </span>
                   </TableCell>
 
                   <TableCell className="px-4 py-3.5">
-                    {item.status === "approved" ? (
-                      <div className="flex items-center gap-2 h-5 px-3 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">
-                        <LucideCheckCircle className="w-4 h-4" /> Approved
-                      </div>
-                    ) : item.status === "declined" ? (
-                      <div className="flex items-center gap-2 h-5 px-3 text-xs border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 transition-colors">
-                        <LucideXCircle className="w-4 h-4" /> Declined
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 px-3 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 transition-colors cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedRow(item);
-                            setDialogState({ open: true, type: "approve" });
-                          }}
-                        >
-                          <LucideCheckCircle /> Approve
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 px-3 text-xs border-red-100 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedRow(item);
-                            setDialogState({ open: true, type: "decline" });
-                          }}
-                        >
-                          <LucideBadgeX /> Decline
-                        </Button>
-                      </div>
-                    )}
+                    <span className="text-sm text-slate-600 truncate max-w-50">
+                      {item.longitude}
+                    </span>
                   </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
-        <PerdinActionDialog
-          open={dialogState.open}
-          setOpen={(val: boolean) =>
-            setDialogState({ ...dialogState, open: val })
-          }
-          variant={dialogState.type}
-          data={selectedRow}
-          isLoading={isUpdating}
-          onConfirm={handleAction}
-        />
       </div>
 
       <div className="flex items-center justify-between text-xs text-slate-400">
@@ -316,7 +183,7 @@ export default function SdmPerdinList() {
           <span className="font-medium text-slate-600">
             {formatNumber(totalItems)}
           </span>{" "}
-          perdin
+          kota
         </span>
 
         <div className="flex items-center gap-1">
