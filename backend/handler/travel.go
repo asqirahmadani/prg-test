@@ -7,6 +7,7 @@ import (
 	"perdin-backend/dto/request"
 	"perdin-backend/dto/response"
 	"perdin-backend/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,7 @@ type TravelUsecase interface {
 	CreateTrip(c context.Context, data request.CreateTripRequest) error
 	UserTravelList(c context.Context, query request.TravelListQueryRequest, userID int) (response.TravelListResponse, error)
 	SdmTravelList(c context.Context, query request.TravelListQueryRequest) (response.SdmTravelListResponse, error)
+	TravelActions(c context.Context, travelID int, actions string) error
 }
 
 type TravelHandler struct {
@@ -99,5 +101,49 @@ func(h *TravelHandler) SdmTravelList(c *gin.Context) {
 	c.JSON(http.StatusOK, response.JSONResponse{
 		Message: "success",
 		Data: travels,
+	})
+}
+
+func(h *TravelHandler) ApproveTravelRequest(c *gin.Context) {
+	travelIDStr := c.Param("travel_id")
+	travelID, err := strconv.Atoi(travelIDStr)
+	if err != nil || travelID <= 0 {
+		c.Error(utils.ErrBadRequest("invalid travel_id"))
+		return
+	}
+
+	if err := h.usecase.TravelActions(c.Request.Context(), travelID, "approve"); err != nil {
+		c.Error(err)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSONResponse{
+		Message: "success",
+		Data: response.InfoResponse{
+			Info: "successfully approve travel request",
+		},
+	})
+}
+
+func(h *TravelHandler) DeclineTravelRequest(c *gin.Context) {
+	travelIDStr := c.Param("travel_id")
+	travelID, err := strconv.Atoi(travelIDStr)
+	if err != nil || travelID <= 0 {
+		c.Error(utils.ErrBadRequest("invalid travel_id"))
+		return
+	}
+
+	if err := h.usecase.TravelActions(c.Request.Context(), travelID, "decline"); err != nil {
+		c.Error(err)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSONResponse{
+		Message: "success",
+		Data: response.InfoResponse{
+			Info: "successfully decline travel request",
+		},
 	})
 }

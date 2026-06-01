@@ -143,3 +143,25 @@ func (r *TravelRepository) TravelListMetadata(c context.Context, conditionQuery 
 
 	return total, nil
 }
+
+func (r *TravelRepository) ExistsPendingTravelByID(c context.Context, travelID int) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM official_travels WHERE id = $1 AND status = 'pending')"
+	
+	if err := r.db.QueryRowContext(c, query, travelID).Scan(&exists); err != nil {
+		return false, err
+	}
+	
+	return exists, nil
+}
+
+func (r *TravelRepository) UpdateTravelStatus(c context.Context, travelID int, status string) error {
+	query := `
+		UPDATE official_travels SET status = $1, updated_at = now()
+		WHERE id = $2;
+	`
+
+	rows, err := r.db.ExecContext(c, query, status, travelID)
+	
+	return utils.CheckRowsAffected(rows, err, "failed to update travel")
+}

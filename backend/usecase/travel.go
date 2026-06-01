@@ -22,6 +22,8 @@ type TravelRepository interface {
 	GetUserTravelList(c context.Context, condition, pagination string, values []any) ([]entity.TravelList, error)
 	GetSdmTravelList(c context.Context, condition, pagination string, values []any) ([]entity.SdmTravelList, error)
 	TravelListMetadata(c context.Context, conditionQuery string, values []any) (int, error)
+	ExistsPendingTravelByID(c context.Context, travelID int) (bool, error)
+	UpdateTravelStatus(c context.Context, travelID int, status string) error
 }
 
 type TravelUsecase struct {
@@ -149,6 +151,31 @@ func (u *TravelUsecase) SdmTravelList(c context.Context, data request.TravelList
 		Travels: mapper.SdmTravelListToResponses(travels),
 		Meta: meta,
 	}, nil
+}
+
+func (u *TravelUsecase) TravelActions(c context.Context, travelID int, actions string) error {
+	exists, err := u.repo.ExistsPendingTravelByID(c, travelID)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.ErrNotFound("travel not found")
+	}
+
+	switch actions {
+	case "approve":
+		err = u.repo.UpdateTravelStatus(c, travelID, "approved")
+	case "decline":
+		err = u.repo.UpdateTravelStatus(c, travelID, "declined")
+	default:
+		err = utils.ErrBadRequest("invalid actions!")
+	}
+
+	if err != nil {
+		return err
+	}
+	
+	return nil
 }
 
 func(u *TravelUsecase) buildQueryCondition(cond entity.QueryCondition) (string, int, []any) {

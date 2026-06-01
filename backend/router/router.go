@@ -54,6 +54,9 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 			sdm.Use(middleware.RoleAccess("sdm"))
 
 			sdm.GET("travels", handler.Travel.SdmTravelList)
+			sdm.POST("travels/:travel_id/approve", handler.Travel.ApproveTravelRequest)
+			sdm.POST("travels/:travel_id/decline", handler.Travel.DeclineTravelRequest)
+
 			sdm.POST("cities", handler.City.CreateCity)
 		}
 	}
