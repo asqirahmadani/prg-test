@@ -92,16 +92,20 @@ export default function PerdinList() {
       setDialogOpen(false);
       mToast.success("Perjalanan dinas berhasil diajukan!");
     } catch (err) {
-      mToast.error(err instanceof Error ? err.message : "Gagal mengajukan perdin");
+      mToast.error(
+        err instanceof Error ? err.message : "Gagal mengajukan perdin",
+      );
     }
   };
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
+      <div className="flex flex-row justify-between">
+        <div className="flex"></div>
+
         <button
           onClick={() => setDialogOpen(true)}
-          className="w-full group flex flex-col items-center justify-center gap-4 py-16 rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-primary/2 hover:border-primary/30 transition-all duration-300"
+          className="w-50 group flex flex-col items-center justify-center gap-4 py- rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-primary/2 hover:border-primary/30 transition-all duration-300"
         >
           Tambah Perdin
         </button>

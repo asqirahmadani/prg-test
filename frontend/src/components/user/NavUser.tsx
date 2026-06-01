@@ -40,7 +40,6 @@ export function NavUser() {
   );
 
   const profile = data?.data;
-  console.log(data);
 
   return (
     <SidebarMenu>

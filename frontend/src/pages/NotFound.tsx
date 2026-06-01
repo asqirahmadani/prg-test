@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router";
 import { LucideArrowLeft, LucideCat } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { useAuth } from "../hooks/auth";
 
 export const NotFound = () => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-blue-50/50 flex flex-col items-center justify-center px-6 overflow-hidden relative font-sans">
@@ -121,16 +123,19 @@ export const NotFound = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/user/dashboard")}
             className="flex items-center px-4 justify-center gap-2 h-10 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-200 transition-all"
           >
-            <LucideArrowLeft /> Back to Home
+            <LucideArrowLeft /> Back to Dashboard
           </Button>
           <Button
-            onClick={() => navigate("/campaigns")}
+            onClick={() => {
+              signOut();
+              navigate("/login");
+            }}
             className="flex items-center px-4 justify-center gap-2 h-10 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-600 text-xs font-bold rounded-xl border border-blue-100 transition-all"
           >
-            <LucideCat /> See Campaigns
+            <LucideCat /> Log Out
           </Button>
         </div>
 

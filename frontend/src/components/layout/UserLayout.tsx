@@ -31,7 +31,7 @@ const navMenus = [
 export const UserLayout = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  console.log(currentPath);
+
   return (
     <>
       <TooltipProvider>
