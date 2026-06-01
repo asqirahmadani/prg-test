@@ -7,6 +7,7 @@ import (
 	"perdin-backend/dto/request"
 	"perdin-backend/dto/response"
 	"perdin-backend/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,7 @@ type CityUsecase interface {
 	CreateCity(c context.Context, data request.CreateCityRequest) error
 	GetCities(c context.Context) ([]response.CityResponse, error)
 	CityList(c context.Context, data request.CityListQueryRequest) (response.CityListResponse, error)
+	DeleteCity(c context.Context, cityID int) error
 }
 
 type CityHandler struct {
@@ -83,5 +85,27 @@ func(h *CityHandler) CityList(c *gin.Context) {
 	c.JSON(http.StatusOK, response.JSONResponse{
 		Message: "success",
 		Data: cities,
+	})
+}
+
+func(h *CityHandler) DeleteCity(c *gin.Context) {
+	cityIDStr := c.Param("city_id")
+	cityID, err := strconv.Atoi(cityIDStr)
+	if err != nil || cityID <= 0 {
+		c.Error(utils.ErrBadRequest("invalid city_id"))
+		return
+	}
+
+	if err := h.usecase.DeleteCity(c.Request.Context(), cityID); err != nil {
+		c.Error(err)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSONResponse{
+		Message: "success",
+		Data: response.InfoResponse{
+			Info: "City deleted successfully",
+		},
 	})
 }

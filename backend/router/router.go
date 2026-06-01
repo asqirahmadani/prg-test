@@ -59,6 +59,7 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 
 			sdm.GET("cities", handler.City.CityList)
 			sdm.POST("cities", handler.City.CreateCity)
+			sdm.DELETE("cities/:city_id", handler.City.DeleteCity)
 		}
 	}
 

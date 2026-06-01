@@ -17,6 +17,7 @@ type CityRepository interface {
 	GetCities(c context.Context) ([]entity.CityList, error)
 	CityList(c context.Context, queryPagination string, values []any) ([]entity.CityData, error)
 	CityListMetadata(c context.Context) (int, error)
+	DeleteCityByID(c context.Context, cityID int) error
 }
 
 type CityUsecase struct {
@@ -101,4 +102,12 @@ func (u *CityUsecase) getCityListMetadata(c context.Context, page, limit int) (r
 		PerPage:     limit,
 		Total:       total,
 	}, nil
+}
+
+func (u *CityUsecase) DeleteCity(c context.Context, cityID int) error {
+	if err := u.repo.DeleteCityByID(c, cityID); err != nil {
+		return err
+	}
+	
+	return nil
 }

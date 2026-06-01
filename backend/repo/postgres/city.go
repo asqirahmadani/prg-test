@@ -103,3 +103,11 @@ func(r *CityRepository) CityListMetadata(c context.Context) (int, error) {
 
 	return total, nil
 }
+
+func(r *CityRepository) DeleteCityByID(c context.Context, cityID int) error {
+	query := "DELETE FROM cities WHERE id =$1"
+
+	rows, err := r.db.ExecContext(c, query, cityID)
+	
+	return utils.CheckRowsAffected(rows, err, "failed to delete city")
+}
