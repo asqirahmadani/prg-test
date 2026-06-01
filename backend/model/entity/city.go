@@ -20,3 +20,13 @@ type CityList struct {
 	ID		int		`db:"id"`
 	Name	string	`db:"name"`
 }
+
+type CityData struct {
+	ID			int		`db:"id"`
+	Name		string	`db:"name"`
+	Province	string	`db:"province"`
+	Island		string	`db:"island"`
+	IsAbroad	bool	`db:"is_abroad"`
+	Latitude	float64	`db:"latitude"`
+	Longitude	float64	`db:"longitude"`
+}

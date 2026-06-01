@@ -14,6 +14,7 @@ import (
 type CityUsecase interface {
 	CreateCity(c context.Context, data request.CreateCityRequest) error
 	GetCities(c context.Context) ([]response.CityResponse, error)
+	CityList(c context.Context, data request.CityListQueryRequest) (response.CityListResponse, error)
 }
 
 type CityHandler struct {
@@ -51,6 +52,28 @@ func(h *CityHandler) CreateCity(c *gin.Context) {
 
 func(h *CityHandler) GetCities(c *gin.Context) {
 	cities, err := h.usecase.GetCities(c.Request.Context())
+	if err != nil {
+		c.Error(err)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSONResponse{
+		Message: "success",
+		Data: cities,
+	})
+}
+
+func(h *CityHandler) CityList(c *gin.Context) {
+	var query request.CityListQueryRequest
+
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.Error(utils.ErrBadRequest(fmt.Sprintf("binding error: %v", err)))
+
+		return
+	}
+
+	cities, err := h.usecase.CityList(c.Request.Context(), query)
 	if err != nil {
 		c.Error(err)
 

@@ -8,3 +8,8 @@ type CreateCityRequest struct {
 	Latitude	float64	`binding:"required" json:"latitude"`
 	Longitude	float64	`binding:"required" json:"longitude"`
 }
+
+type CityListQueryRequest struct {
+	Page   	int     `form:"page,default=1"  binding:"min=1"`
+    Limit  	int     `form:"limit,default=10" binding:"min=1,max=100"`
+}

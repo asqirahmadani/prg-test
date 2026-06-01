@@ -57,6 +57,7 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 			sdm.POST("travels/:travel_id/approve", handler.Travel.ApproveTravelRequest)
 			sdm.POST("travels/:travel_id/decline", handler.Travel.DeclineTravelRequest)
 
+			sdm.GET("cities", handler.City.CityList)
 			sdm.POST("cities", handler.City.CreateCity)
 		}
 	}

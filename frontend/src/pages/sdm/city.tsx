@@ -46,7 +46,7 @@ export default function CityList() {
     mutate,
   } = useSWR<SdmCity>(
     [
-      `${import.meta.env.VITE_BACKEND_URL}/sdm/travels?${buildParams()}`,
+      `${import.meta.env.VITE_BACKEND_URL}/sdm/cities?${buildParams()}`,
       user.token,
     ],
     authFetcher,
@@ -67,7 +67,7 @@ export default function CityList() {
           onClick={() => setDialogOpen(true)}
           className="w-50 group flex flex-col items-center justify-center gap-4 py- rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-primary/2 hover:border-primary/30 transition-all duration-300"
         >
-          Tambah Perdin
+          Tambah Kota
         </button>
       </div>
 
