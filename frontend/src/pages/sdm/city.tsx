@@ -21,6 +21,10 @@ import {
   LucideSearch,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import CityDialog from "../../components/dialog/CityDialog";
+import type { CityRequest } from "../../types/city";
+import { useCity } from "../../hooks/useCity";
+import { mToast } from "../../components/base/mToast";
 
 const PAGE_SIZE = 10;
 
@@ -29,6 +33,7 @@ export default function CityList() {
   const [page, setPage] = useState(1);
 
   const { user } = useAuth();
+  const { create } = useCity();
 
   const buildParams = () => {
     const params = new URLSearchParams({
@@ -57,6 +62,18 @@ export default function CityList() {
   const totalPages = Math.max(1, rawData?.data?.meta?.last_page ?? 1);
 
   const visiblePages = getVisiblePages(page, totalPages);
+
+  const handleSubmit = async (a: CityRequest) => {
+    try {
+      await create(a);
+      setDialogOpen(false);
+      mToast.success("Kota berhasil ditambahkan");
+    } catch (err) {
+      mToast.error(
+        err instanceof Error ? err.message : "Gagal mengajukan perdin",
+      );
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -240,6 +257,12 @@ export default function CityList() {
           </Button>
         </div>
       </div>
+
+      <CityDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }

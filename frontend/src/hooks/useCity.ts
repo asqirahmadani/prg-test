@@ -1,9 +1,12 @@
 import useSWR from "swr";
+import { mutate as globalMutate } from "swr";
 import type { City } from "../api/city";
-import { authFetcher } from "../utils/fetcher";
+import { authFetcher, mutator } from "../utils/fetcher";
 import { useMemo } from "react";
 import { useAuth } from "../hooks/auth";
 import type { SelectOption } from "../types/base";
+import useSWRMutation from "swr/mutation";
+import type { CityRequest } from "../types/city";
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -27,4 +30,29 @@ export function useCities() {
   }, [data]);
 
   return { cities, ...rest };
+}
+
+export function useCreateCity() {
+  const { user } = useAuth();
+
+  return useSWRMutation(
+    "/sdm/cities",
+    (url: string, { arg }: { arg: Omit<CityRequest, "id"> }) =>
+      mutator(url, {
+        arg: {
+          method: "POST",
+          data: arg,
+          header: { Authorization: `Bearer ${user.token}` },
+        },
+      }),
+    { onSuccess: () => globalMutate("/sdm/cities") },
+  );
+}
+
+export function useCity() {
+  const { trigger: createTrigger } = useCreateCity();
+
+  const create = (data: CityRequest) => createTrigger(data);
+
+  return { create };
 }
