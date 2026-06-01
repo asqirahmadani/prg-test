@@ -49,10 +49,28 @@ export function useCreateCity() {
   );
 }
 
+export function useDeleteCity() {
+  const { user } = useAuth();
+
+  return useSWRMutation(
+    "/sdm/cities",
+    (url: string, { arg }: { arg: Number }) =>
+      mutator(`${url}/${arg}`, {
+        arg: {
+          method: "DELETE",
+          header: { Authorization: `Bearer ${user.token}` },
+        },
+      }),
+    { onSuccess: () => globalMutate("/sdm/cities") },
+  );
+}
+
 export function useCity() {
   const { trigger: createTrigger } = useCreateCity();
+  const { trigger: triggerDelete, isMutating: loadingDelete } = useDeleteCity();
 
   const create = (data: CityRequest) => createTrigger(data);
+  const deleted = (id: Number) => triggerDelete(id);
 
-  return { create };
+  return { create, deleted, loadingDelete };
 }

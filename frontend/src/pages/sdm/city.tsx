@@ -25,15 +25,18 @@ import CityDialog from "../../components/dialog/CityDialog";
 import type { CityRequest } from "../../types/city";
 import { useCity } from "../../hooks/useCity";
 import { mToast } from "../../components/base/mToast";
+import { DeleteCityDialog } from "../../components/dialog/DeleteCityDialog";
 
 const PAGE_SIZE = 10;
 
 export default function CityList() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<any | null>(null);
   const [page, setPage] = useState(1);
 
   const { user } = useAuth();
-  const { create } = useCity();
+  const { create, deleted, loadingDelete } = useCity();
 
   const buildParams = () => {
     const params = new URLSearchParams({
@@ -70,8 +73,22 @@ export default function CityList() {
       mToast.success("Kota berhasil ditambahkan");
     } catch (err) {
       mToast.error(
-        err instanceof Error ? err.message : "Gagal mengajukan perdin",
+        err instanceof Error ? err.message : "Gagal menambahkan kota",
       );
+    }
+  };
+
+  const onConfirmDelete = async () => {
+    if (!selectedRow) return;
+
+    try {
+      await deleted(selectedRow.id);
+
+      setIsDeleteOpen(false);
+      mToast.success("Kota berhasil dihapus");
+      mutate();
+    } catch (err) {
+      mToast.error(err instanceof Error ? err.message : "Gagal menghapus kota");
     }
   };
 
@@ -112,6 +129,9 @@ export default function CityList() {
               </TableHead>
               <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
                 Longitude
+              </TableHead>
+              <TableHead className="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-70">
+                Aksi
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -182,12 +202,37 @@ export default function CityList() {
                       {item.longitude}
                     </span>
                   </TableCell>
+
+                  <TableCell className="px-4 py-3.5">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 px-3 text-xs border-red-100 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRow(item);
+                        setIsDeleteOpen(true);
+                      }}
+                    >
+                      Hapus
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
       </div>
+
+      {isDeleteOpen && (
+        <DeleteCityDialog
+          open={isDeleteOpen}
+          setOpen={setIsDeleteOpen}
+          data={selectedRow}
+          isLoading={loadingDelete}
+          onConfirm={onConfirmDelete}
+        />
+      )}
 
       <div className="flex items-center justify-between text-xs text-slate-400">
         <span>
