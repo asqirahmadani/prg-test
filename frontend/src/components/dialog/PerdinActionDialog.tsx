@@ -10,7 +10,7 @@ import {
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { LucideAlertTriangle, LucideCheckCircle2, Loader2 } from "lucide-react";
-import { formatRpLong } from "../../utils/user";
+import { formatDate, formatRpLong } from "../../utils/user";
 
 interface WithdrawActionDialogProps {
   open: boolean;
@@ -48,6 +48,10 @@ export function PerdinActionDialog({
           oleh{" "}
           <span className="font-semibold text-slate-800">
             {data?.user_name}
+          </span>{" "}
+          dari tanggal{" "}
+          <span className="font-semibold text-slate-800">
+            {formatDate(data?.departure_date)} → {formatDate(data?.return_date)}
           </span>
           . Dengan total uang saku{" "}
           <span className="font-semibold text-blue-600">
@@ -69,7 +73,11 @@ export function PerdinActionDialog({
           <span className="font-semibold text-slate-800">
             {data?.origin_city} → {data?.destination_city}
           </span>{" "}
-          by{" "}
+          dari tanggal{" "}
+          <span className="font-semibold text-slate-800">
+            {formatDate(data?.departure_date)} → {formatDate(data?.return_date)}
+          </span>{" "}
+          oleh{" "}
           <span className="font-semibold text-slate-800">
             {data?.user_name}
           </span>

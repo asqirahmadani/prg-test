@@ -95,7 +95,7 @@ func (u *TravelUsecase) getAllowance(c context.Context, originID, destinationID,
 	}
 
 	if destination.IsAbroad {
-		return (constant.USDtoIDR * float64(tripDuration)), nil
+		return (constant.USDtoIDR * float64(tripDuration) * 50), nil
 	}
 
 	if origin.Province != destination.Province && origin.Island != destination.Island {
