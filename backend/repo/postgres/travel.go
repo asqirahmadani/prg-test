@@ -95,6 +95,38 @@ func(r *TravelRepository) GetUserTravelList(c context.Context, condition, pagina
 	return travels, nil
 }
 
+func(r *TravelRepository) GetSdmTravelList(c context.Context, condition, pagination string, values []any) ([]entity.SdmTravelList, error) {
+	var query strings.Builder
+
+	query.WriteString(`
+		SELECT
+			ot.id,
+			u.name as user_name,
+			oc.name as origin_city,
+			dc.name as destination_city,
+			ot.departure_date,
+			ot.return_date,
+			ot.description,
+			ot.trip_duration,
+			ot.allowance,
+			ot.status
+		FROM official_travels ot
+		JOIN users u ON u.id = ot.user_id
+		JOIN cities oc ON oc.id = ot.origin_city_id 
+		JOIN cities dc ON dc.id = ot.destination_city_id 
+	`)
+
+	query.WriteString(condition)
+	query.WriteString(pagination)
+
+	var travels []entity.SdmTravelList
+	if err := r.db.SelectContext(c, &travels, query.String(), values...); err != nil {
+		return nil, err
+	}
+	
+	return travels, nil
+}
+
 func (r *TravelRepository) TravelListMetadata(c context.Context, conditionQuery string, values []any) (int, error) {
 	var query strings.Builder
 

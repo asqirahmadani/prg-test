@@ -25,6 +25,19 @@ type TravelList struct {
 	Status			string		`db:"status"`
 }
 
+type SdmTravelList struct {
+	ID				int			`db:"id"`
+	UserName		string		`db:"user_name"`
+	OriginCity		string		`db:"origin_city"`
+	DestinationCity	string		`db:"destination_city"`
+	DepartureDate	time.Time	`db:"departure_date"`
+	ReturnDate		time.Time	`db:"return_date"`
+	Description		string		`db:"description"`
+	TripDuration	int			`db:"trip_duration"`
+	Allowance		float64		`db:"allowance"`
+	Status			string		`db:"status"`
+}
+
 type QueryCondition struct {
     UserID 		*int
 	Status		*string

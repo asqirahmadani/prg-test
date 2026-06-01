@@ -11,6 +11,7 @@ export interface UserTravelList {
 
 export interface TravelList {
   id: number;
+  user_name: string;
   origin_city: string;
   destination_city: string;
   departure_date: string;

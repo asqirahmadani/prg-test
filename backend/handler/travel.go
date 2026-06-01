@@ -14,7 +14,7 @@ import (
 type TravelUsecase interface {
 	CreateTrip(c context.Context, data request.CreateTripRequest) error
 	UserTravelList(c context.Context, query request.TravelListQueryRequest, userID int) (response.TravelListResponse, error)
-	SdmTravelList(c context.Context, query request.TravelListQueryRequest) (response.TravelListResponse, error)
+	SdmTravelList(c context.Context, query request.TravelListQueryRequest) (response.SdmTravelListResponse, error)
 }
 
 type TravelHandler struct {

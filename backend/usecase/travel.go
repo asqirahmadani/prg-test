@@ -20,6 +20,7 @@ type TravelRepository interface {
 	GetCityDistance(c context.Context, originID, destinationID int) (int, error)
 	GetCityByID(c context.Context, cityID int) (entity.City, error)
 	GetUserTravelList(c context.Context, condition, pagination string, values []any) ([]entity.TravelList, error)
+	GetSdmTravelList(c context.Context, condition, pagination string, values []any) ([]entity.SdmTravelList, error)
 	TravelListMetadata(c context.Context, conditionQuery string, values []any) (int, error)
 }
 
@@ -130,22 +131,22 @@ func (u *TravelUsecase) UserTravelList(c context.Context, data request.TravelLis
 	}, nil
 }
 
-func (u *TravelUsecase) SdmTravelList(c context.Context, data request.TravelListQueryRequest) (response.TravelListResponse, error) {
+func (u *TravelUsecase) SdmTravelList(c context.Context, data request.TravelListQueryRequest) (response.SdmTravelListResponse, error) {
 	conditionQuery, args, values := u.buildQueryCondition(entity.QueryCondition{Status: data.Status})
 	paginationQuery, finalValues := u.writePaginationQuery(data.Page, data.Limit, args, values)
 
-	travels, err := u.repo.GetUserTravelList(c, conditionQuery, paginationQuery, finalValues)
+	travels, err := u.repo.GetSdmTravelList(c, conditionQuery, paginationQuery, finalValues)
 	if err != nil {
-		return response.TravelListResponse{}, err
+		return response.SdmTravelListResponse{}, err
 	}
 
 	meta, err := u.getTravelListMetadata(c, data.Page, data.Limit, conditionQuery, values)
 	if err != nil {
-		return response.TravelListResponse{}, err
+		return response.SdmTravelListResponse{}, err
 	}
 
-	return response.TravelListResponse{
-		Travels: mapper.TravelListToResponses(travels),
+	return response.SdmTravelListResponse{
+		Travels: mapper.SdmTravelListToResponses(travels),
 		Meta: meta,
 	}, nil
 }
