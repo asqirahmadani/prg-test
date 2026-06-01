@@ -3,6 +3,7 @@ import {
   formatDate,
   formatNumber,
   getVisiblePages,
+  type TravelQuery,
   type TravelStatus,
 } from "../../utils/user";
 import { useAuth } from "../../hooks/auth";
@@ -26,10 +27,6 @@ import {
   LucideSearch,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import PerdinDialog from "../../components/dialog/PerdinDialog";
-import type { TravelRequest } from "../../types/travel";
-import { useTravel } from "../../hooks/useTravel";
-import { mToast } from "../../components/base/mToast";
 
 function StatusPill({ status }: { status: TravelStatus }) {
   const styles = {
@@ -50,11 +47,10 @@ function StatusPill({ status }: { status: TravelStatus }) {
 
 const PAGE_SIZE = 10;
 
-export default function UserPerdinList() {
-  const { create } = useTravel();
-
-  const [dialogOpen, setDialogOpen] = useState(false);
+export default function SdmPerdinList() {
+  //   const [dialogOpen, setDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState<TravelQuery>("pending");
 
   const { user } = useAuth();
 
@@ -63,6 +59,8 @@ export default function UserPerdinList() {
       page: String(page),
       limit: String(PAGE_SIZE),
     });
+
+    if (selectedStatus) params.append("status", String(selectedStatus));
 
     return params.toString();
   };
@@ -74,7 +72,7 @@ export default function UserPerdinList() {
     mutate,
   } = useSWR<UserTravel>(
     [
-      `${import.meta.env.VITE_BACKEND_URL}/travels/list?${buildParams()}`,
+      `${import.meta.env.VITE_BACKEND_URL}/sdm/travels?${buildParams()}`,
       user.token,
     ],
     authFetcher,
@@ -86,29 +84,31 @@ export default function UserPerdinList() {
 
   const visiblePages = getVisiblePages(page, totalPages);
 
-  const handleSubmit = async (a: TravelRequest) => {
-    try {
-      await create(a);
-      setDialogOpen(false);
-      mToast.success("Perjalanan dinas berhasil diajukan!");
-    } catch (err) {
-      mToast.error(
-        err instanceof Error ? err.message : "Gagal mengajukan perdin",
-      );
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-row justify-between">
-        <div className="flex"></div>
-
-        <button
-          onClick={() => setDialogOpen(true)}
-          className="w-50 group flex flex-col items-center justify-center gap-4 py- rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-primary/2 hover:border-primary/30 transition-all duration-300"
+      <div>
+        <Button
+          //   variant="ghost"
+          className={
+            selectedStatus === "pending"
+              ? "bg-blue-500 cursor-pointer"
+              : "bg-blue-300 cursor-pointer"
+          }
+          onClick={() => setSelectedStatus("pending")}
         >
-          Tambah Perdin
-        </button>
+          Pengajuan Baru
+        </Button>
+        <Button
+          //   variant="ghost"
+          className={
+            selectedStatus === "history"
+              ? "bg-blue-500 cursor-pointer"
+              : "bg-blue-300 cursor-pointer"
+          }
+          onClick={() => setSelectedStatus("history")}
+        >
+          History Pengajuan
+        </Button>
       </div>
 
       <div className="rounded-xl border border-slate-200/80 overflow-hidden bg-white shadow-sm">
@@ -261,12 +261,6 @@ export default function UserPerdinList() {
           </Button>
         </div>
       </div>
-
-      <PerdinDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSubmit={handleSubmit}
-      />
     </div>
   );
 }

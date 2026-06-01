@@ -1,4 +1,5 @@
 export type TravelStatus = "pending" | "approved" | "declined";
+export type TravelQuery = "pending" | "history";
 
 export const getVisiblePages = (current: number, total: number) => {
   const size = 5;

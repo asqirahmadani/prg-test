@@ -7,10 +7,10 @@ import {
 } from "./lib/RouteGuard";
 import LoginPage from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import { SdmDashboard } from "./pages/SdmDashboard";
 import { UserLayout } from "./components/layout/UserLayout";
 import { SdmLayout } from "./components/layout/SdmLayout";
-import PerdinList from "./pages/user/perdinku";
+import UserPerdinList from "./pages/user/perdinku";
+import SdmPerdinList from "./pages/sdm/perdin";
 
 export const routes = createBrowserRouter([
   {
@@ -26,7 +26,7 @@ export const routes = createBrowserRouter([
           {
             path: "sdm/dashboard",
             Component: SdmLayout,
-            children: [{ index: true, Component: SdmDashboard }],
+            children: [{ index: true, Component: SdmPerdinList }],
           },
         ],
       },
@@ -41,7 +41,7 @@ export const routes = createBrowserRouter([
           {
             path: "user/dashboard",
             Component: UserLayout,
-            children: [{ index: true, Component: PerdinList }],
+            children: [{ index: true, Component: UserPerdinList }],
           },
         ],
       },
