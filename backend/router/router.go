@@ -46,9 +46,15 @@ func SetupRouter(cfg config.Config, handler *handler.Handlers) *gin.Engine {
 		city.Use(middleware.AuthMiddleware(cfg.JWT))
 		{
 			city.GET("", handler.City.GetCities)
+		}
 
-			city.Use(middleware.RoleAccess("sdm"))
-			city.POST("", handler.City.CreateCity)
+		sdm := root.Group("/sdm")
+		sdm.Use(middleware.AuthMiddleware(cfg.JWT))
+		{
+			sdm.Use(middleware.RoleAccess("sdm"))
+
+			sdm.GET("travels", handler.Travel.SdmTravelList)
+			sdm.POST("cities", handler.City.CreateCity)
 		}
 	}
 

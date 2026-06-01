@@ -10,6 +10,7 @@ type CreateTripRequest struct {
 }
 
 type TravelListQueryRequest struct {
-	Page   int     `form:"page,default=1"  binding:"min=1"`
-    Limit  int     `form:"limit,default=10" binding:"min=1,max=100"`
+	Page   	int     `form:"page,default=1"  binding:"min=1"`
+    Limit  	int     `form:"limit,default=10" binding:"min=1,max=100"`
+	Status	*string	`form:"status" binding:"omitempty,oneof=pending history"`
 }

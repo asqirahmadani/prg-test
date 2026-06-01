@@ -130,6 +130,26 @@ func (u *TravelUsecase) UserTravelList(c context.Context, data request.TravelLis
 	}, nil
 }
 
+func (u *TravelUsecase) SdmTravelList(c context.Context, data request.TravelListQueryRequest) (response.TravelListResponse, error) {
+	conditionQuery, args, values := u.buildQueryCondition(entity.QueryCondition{Status: data.Status})
+	paginationQuery, finalValues := u.writePaginationQuery(data.Page, data.Limit, args, values)
+
+	travels, err := u.repo.GetUserTravelList(c, conditionQuery, paginationQuery, finalValues)
+	if err != nil {
+		return response.TravelListResponse{}, err
+	}
+
+	meta, err := u.getTravelListMetadata(c, data.Page, data.Limit, conditionQuery, values)
+	if err != nil {
+		return response.TravelListResponse{}, err
+	}
+
+	return response.TravelListResponse{
+		Travels: mapper.TravelListToResponses(travels),
+		Meta: meta,
+	}, nil
+}
+
 func(u *TravelUsecase) buildQueryCondition(cond entity.QueryCondition) (string, int, []any) {
 	var (
         whereCondition strings.Builder
@@ -143,6 +163,16 @@ func(u *TravelUsecase) buildQueryCondition(cond entity.QueryCondition) (string, 
         values = append(values, *cond.UserID)
         args++
     }
+
+	if cond.Status != nil {
+		if *cond.Status == "pending" {
+			where = append(where, fmt.Sprintf("ot.status = $%d", args))
+			values = append(values, *cond.Status)
+			args++
+		} else {
+			where = append(where, "(ot.status = 'approved' OR ot.status = 'declined')")
+		}
+	}
 
 	if len(where) > 0 {
         whereCondition.WriteString(" WHERE ")

@@ -27,4 +27,5 @@ type TravelList struct {
 
 type QueryCondition struct {
     UserID 		*int
+	Status		*string
 }

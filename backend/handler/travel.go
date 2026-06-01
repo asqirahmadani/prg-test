@@ -14,6 +14,7 @@ import (
 type TravelUsecase interface {
 	CreateTrip(c context.Context, data request.CreateTripRequest) error
 	UserTravelList(c context.Context, query request.TravelListQueryRequest, userID int) (response.TravelListResponse, error)
+	SdmTravelList(c context.Context, query request.TravelListQueryRequest) (response.TravelListResponse, error)
 }
 
 type TravelHandler struct {
@@ -67,6 +68,28 @@ func (h *TravelHandler) UserTravelList(c *gin.Context) {
 	userID := int(rawID)
 
 	travels, err := h.usecase.UserTravelList(c.Request.Context(), query, userID)
+	if err != nil {
+		c.Error(err)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSONResponse{
+		Message: "success",
+		Data: travels,
+	})
+}
+
+func(h *TravelHandler) SdmTravelList(c *gin.Context) {
+	var query request.TravelListQueryRequest
+
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.Error(utils.ErrBadRequest(fmt.Sprintf("binding error: %v", err)))
+
+		return
+	}
+
+	travels, err := h.usecase.SdmTravelList(c.Request.Context(), query)
 	if err != nil {
 		c.Error(err)
 
